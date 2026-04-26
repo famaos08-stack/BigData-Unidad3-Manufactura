@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Big Data en la Industria Manufacturera | EDIT - DANE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0b1226; --bg2:#101a36; --panel:#13203f; --line:#1f2d52;
+    --txt:#e7ecff; --muted:#8b97c2; --accent:#38bdf8; --accent2:#22d3ee;
+    --good:#22c55e; --warn:#f59e0b; --bad:#ef4444; --grad1:#1f6feb; --grad2:#22d3ee;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;line-height:1.6;overflow-x:hidden}
+  body{
+    background:
+      radial-gradient(1200px 600px at 10% 0%, rgba(56,189,248,.12), transparent 60%),
+      radial-gradient(900px 500px at 90% 100%, rgba(34,211,238,.10), transparent 60%),
+      var(--bg);
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 80px}
+
+  /* HERO */
+  .hero{position:relative;text-align:center;padding:60px 20px 40px;overflow:hidden;border-radius:24px;
+    background:linear-gradient(135deg, rgba(31,111,235,.15), rgba(34,211,238,.08));
+    border:1px solid var(--line)}
+  .hero::before{content:"";position:absolute;inset:-2px;border-radius:24px;
+    background:conic-gradient(from 0deg,transparent,rgba(56,189,248,.4),transparent 30%);
+    animation:spin 8s linear infinite;z-index:0;filter:blur(40px);opacity:.4}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hero > *{position:relative;z-index:1}
+  .badge{display:inline-block;padding:6px 14px;font-size:12px;font-weight:600;letter-spacing:1.5px;
+    background:rgba(56,189,248,.15);color:var(--accent);border:1px solid rgba(56,189,248,.3);
+    border-radius:999px;text-transform:uppercase;animation:fadeUp .8s ease both}
+  h1{font-size:clamp(28px,5vw,52px);font-weight:900;margin:18px 0 12px;letter-spacing:-0.02em;
+    background:linear-gradient(90deg,#fff 0%,var(--accent2) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:fadeUp 1s .1s ease both}
+  .sub{color:var(--muted);max-width:760px;margin:0 auto;font-size:17px;animation:fadeUp 1s .2s ease both}
+  .tag{margin-top:18px;color:var(--muted);font-size:13px;animation:fadeUp 1s .3s ease both}
+  .tag b{color:var(--txt)}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+  @keyframes count{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+
+  /* SECCIONES */
+  section{margin-top:56px;animation:fadeIn 1.2s ease both}
+  h2{font-size:clamp(22px,3vw,30px);font-weight:800;margin-bottom:8px;letter-spacing:-0.01em}
+  h2 .num{color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:500}
+  .lede{color:var(--muted);max-width:820px;margin-bottom:28px}
+
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;
+    position:relative;overflow:hidden;transition:transform .3s, border-color .3s}
+  .kpi:hover{transform:translateY(-4px);border-color:var(--accent)}
+  .kpi::before{content:"";position:absolute;top:0;left:0;height:3px;width:100%;
+    background:linear-gradient(90deg,var(--grad1),var(--grad2))}
+  .kpi .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+  .kpi .val{font-size:34px;font-weight:800;margin-top:4px;
+    background:linear-gradient(90deg,#fff,var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:count 1s ease both}
+  .kpi .sml{font-size:13px;color:var(--muted);margin-top:4px}
+
+  /* CAPACIDADES */
+  .caps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:8px}
+  .cap{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;
+    position:relative;transition:all .3s ease;cursor:default}
+  .cap:hover{transform:translateY(-6px);border-color:var(--accent2);box-shadow:0 16px 40px -10px rgba(34,211,238,.25)}
+  .cap .icon{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--grad1),var(--grad2));font-size:22px;margin-bottom:14px;
+    animation:pulse 3s ease-in-out infinite}
+  .cap h3{font-size:16px;font-weight:700;margin-bottom:8px}
+  .cap p{font-size:14px;color:var(--muted);line-height:1.55}
+  .cap .nro{position:absolute;top:14px;right:18px;font-family:'JetBrains Mono',monospace;
+    color:var(--line);font-size:42px;font-weight:700;line-height:1}
+
+  /* GRÁFICAS */
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:20px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  .card h4{font-size:15px;font-weight:700;margin-bottom:6px}
+  .card .desc{font-size:13px;color:var(--muted);margin-bottom:14px}
+  .chart-wrap{position:relative;height:280px}
+
+  /* HALLAZGOS */
+  .findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .find{background:linear-gradient(135deg,rgba(56,189,248,.06),rgba(34,211,238,.03));
+    border:1px solid var(--line);border-radius:14px;padding:20px}
+  .find .lbl{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);font-weight:600}
+  .find h5{font-size:17px;font-weight:700;margin:8px 0}
+  .find p{font-size:14px;color:var(--muted)}
+  .find.bad .lbl{color:var(--bad)}
+  .find.good .lbl{color:var(--good)}
+  .find.warn .lbl{color:var(--warn)}
+
+  /* FOOTER */
+  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);
+    text-align:center;color:var(--muted);font-size:13px}
+  footer a{color:var(--accent);text-decoration:none}
+  .pipe{display:inline-block;margin:0 10px;color:var(--line)}
+
+  /* SCROLL ANIMATIONS */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease, transform .8s ease}
+  .reveal.show{opacity:1;transform:none}
+
+  /* Decorativo */
+  .gear{position:absolute;width:120px;height:120px;border:8px dashed rgba(56,189,248,.15);
+    border-radius:50%;animation:spin 30s linear infinite;pointer-events:none}
+  .gear.r1{top:30px;right:-40px}
+  .gear.r2{bottom:-40px;left:-40px;animation-direction:reverse;width:160px;height:160px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<header class="hero">
+  <div class="gear r1"></div>
+  <div class="gear r2"></div>
+  <span class="badge">Big Data · Tratamiento de Datos · Unidad 3</span>
+  <h1>Big Data en la Industria Manufacturera Colombiana</h1>
+  <p class="sub">Capacidades predictivas y análisis exploratorio sobre la <b>Encuesta de Desarrollo e Innovación Tecnológica (EDIT)</b> del DANE — datos abiertos del sector manufacturero.</p>
+  <p class="tag">Claudia Marcela Villarraga Rodriguez · <b>Universidad Católica de Colombia</b></p>
+</header>
+
+<!-- SECCIÓN 1: KPIs -->
+<section class="reveal">
+  <h2><span class="num">01</span> · El dataset en cifras</h2>
+  <p class="lede">Marco analítico construido sobre <b>7.800 registros</b> de empresas manufactureras siguiendo la metodología EDIT del DANE: 23 divisiones CIIU, 4 categorías de tamaño y más de 20 variables de innovación, inversión e indicadores de CTI.</p>
+  <div class="kpis">
+    <div class="kpi"><div class="lbl">Empresas</div><div class="val" id="k1">7.800</div><div class="sml">Marco manufacturero</div></div>
+    <div class="kpi"><div class="lbl">Innovadoras</div><div class="val" id="k2">39,22%</div><div class="sml">3.059 empresas</div></div>
+    <div class="kpi"><div class="lbl">Inversión ACTI</div><div class="val" id="k3">$4,37 B</div><div class="sml">Millones COP</div></div>
+    <div class="kpi"><div class="lbl">Personal CTI</div><div class="val" id="k4">82.976</div><div class="sml">Ciencia, Tec. e Innov.</div></div>
+  </div>
+</section>
+
+<!-- SECCIÓN 2: CAPACIDADES -->
+<section class="reveal">
+  <h2><span class="num">02</span> · 7 capacidades predictivas para manufactura</h2>
+  <p class="lede">A partir del análisis del Big Data en la industria manufacturera, se identificaron siete capacidades predictivas clave que permiten anticipar comportamientos, optimizar recursos y generar ventajas competitivas.</p>
+  <div class="caps">
+    <div class="cap"><span class="nro">1</span><div class="icon">🔧</div><h3>Mantenimiento predictivo</h3><p>Algoritmos sobre datos de sensores IoT para anticipar fallos en maquinaria y reducir paradas no planificadas hasta en un 50%.</p></div>
+    <div class="cap"><span class="nro">2</span><div class="icon">🚚</div><h3>Optimización de cadena de suministro</h3><p>Modelos predictivos de demanda y rutas que ajustan inventarios, reducen quiebres de stock y minimizan costos logísticos.</p></div>
+    <div class="cap"><span class="nro">3</span><div class="icon">✅</div><h3>Control de calidad inteligente</h3><p>Visión artificial y modelos sobre líneas de producción para detectar defectos en tiempo real antes del despacho.</p></div>
+    <div class="cap"><span class="nro">4</span><div class="icon">📈</div><h3>Pronóstico de demanda</h3><p>Modelos de series de tiempo y machine learning que anticipan ventas, ajustan turnos y dimensionan capacidad productiva.</p></div>
+    <div class="cap"><span class="nro">5</span><div class="icon">⚡</div><h3>Eficiencia energética</h3><p>Predicción de consumo por planta y proceso para identificar desviaciones, reducir costos y certificaciones ambientales.</p></div>
+    <div class="cap"><span class="nro">6</span><div class="icon">🛡️</div><h3>Seguridad ocupacional</h3><p>Análisis de patrones de incidentes para anticipar zonas y turnos de mayor riesgo y desplegar acciones preventivas.</p></div>
+    <div class="cap"><span class="nro">7</span><div class="icon">💡</div><h3>Innovación de producto</h3><p>Análisis de datos de uso, retroalimentación y mercado para priorizar I+D+i con mayor probabilidad de éxito comercial.</p></div>
+  </div>
+</section>
+
+<!-- SECCIÓN 3: GRÁFICAS -->
+<section class="reveal">
+  <h2><span class="num">03</span> · Análisis exploratorio EDA</h2>
+  <p class="lede">Exploración de las variables clave de la EDIT: relaciones, patrones recurrentes y anomalías que revelan dinámicas de innovación en la manufactura colombiana.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Tasa de innovación por sector CIIU</h4>
+      <p class="desc">Patrón: los sectores intensivos en conocimiento (Farmacéuticos, Informática, Coque) muestran las tasas más altas de empresas innovadoras.</p>
+      <div class="chart-wrap"><canvas id="chartSectores"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h4>Inversión ACTI por tamaño de empresa</h4>
+      <p class="desc">Patrón: la inversión escala fuertemente con el tamaño. Las grandes concentran la mayor parte del gasto en innovación.</p>
+      <div class="chart-wrap"><canvas id="chartTam"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h4>Composición del financiamiento</h4>
+      <p class="desc">Patrón: dependencia marcada de recursos propios (≈70%); el sector público financia menos del 7% de la innovación manufacturera.</p>
+      <div class="chart-wrap"><canvas id="chartFin"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h4>Tipos de innovación introducidos</h4>
+      <p class="desc">Relación: las innovaciones de proceso y producto coexisten en la mayoría de empresas innovadoras; mercadeo es la menos frecuente.</p>
+      <div class="chart-wrap"><canvas id="chartTipos"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h4>Personal CTI vs Inversión ACTI</h4>
+      <p class="desc">Relación positiva fuerte (ρ ≈ 0,58 en escala log): a mayor personal calificado, mayor inversión en innovación.</p>
+      <div class="chart-wrap"><canvas id="chartScatter"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h4>Obstáculos principales a la innovación</h4>
+      <p class="desc">Patrón: el alto costo y la falta de recursos concentran cerca del 50% de las barreras reportadas.</p>
+      <div class="chart-wrap"><canvas id="chartObs"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECCIÓN 4: HALLAZGOS -->
+<section class="reveal">
+  <h2><span class="num">04</span> · Hallazgos del EDA</h2>
+  <p class="lede">Las relaciones, patrones y anomalías identificados en la base de datos.</p>
+  <div class="findings">
+    <div class="find good"><div class="lbl">Relación 1</div><h5>Personal CTI ↔ Inversión ACTI</h5><p>Correlación log-log de 0,58. Las empresas con equipos técnicos más grandes destinan más recursos a innovación.</p></div>
+    <div class="find good"><div class="lbl">Relación 2</div><h5>Tamaño ↔ Probabilidad de innovar</h5><p>Las empresas grandes presentan tasas de innovación 2,6 veces mayores que las microempresas.</p></div>
+    <div class="find"><div class="lbl">Patrón 1</div><h5>Liderazgo sectorial</h5><p>Farmacéuticos (58,6%) e Informática y electrónica encabezan la innovación; Madera (22,5%) y Reparación cierran la lista.</p></div>
+    <div class="find"><div class="lbl">Patrón 2</div><h5>Estructura de financiamiento</h5><p>70% recursos propios, 17% banca, &lt;7% sector público. Brecha clara en política pública de fomento.</p></div>
+    <div class="find warn"><div class="lbl">Patrón 3</div><h5>Innovación dual</h5><p>El 71% de empresas innovadoras combinan innovación de proceso con producto; mercadeo se queda en 36%.</p></div>
+    <div class="find bad"><div class="lbl">Anomalías</div><h5>190 outliers extremos</h5><p>Empresas con z-score &gt; 3 en inversión ACTI dentro de su sector — concentradas en grandes empresas de Minerales no metálicos, Confecciones e Impresión.</p></div>
+  </div>
+</section>
+
+<!-- SECCIÓN 5: DESCARGA -->
+<section class="reveal">
+  <h2><span class="num">05</span> · Descarga de datos</h2>
+  <p class="lede">Accede a la base de datos completa utilizada en el análisis exploratorio. El archivo contiene 7.800 registros de empresas manufactureras con 20 variables de innovación, inversión y CTI.</p>
+  <div style="text-align:center;margin-top:24px">
+    <a href="EDIT_Manufactura_EDA.xlsx" download
+       style="display:inline-flex;align-items:center;gap:12px;padding:18px 36px;
+              background:linear-gradient(135deg,var(--grad1),var(--grad2));
+              color:#fff;font-weight:700;font-size:16px;border-radius:14px;
+              text-decoration:none;transition:all .3s ease;border:none;cursor:pointer;
+              box-shadow:0 8px 30px -8px rgba(34,211,238,.35)">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Descargar datos (.xlsx)
+    </a>
+    <p style="margin-top:14px;font-size:13px;color:var(--muted)">EDIT_Manufactura_EDA.xlsx · 7.800 registros · 20 variables · Formato Excel</p>
+  </div>
+</section>
+
+<footer>
+  <p>Big Data · Unidad 3 — Tratamiento de Datos<br>
+  Fuente: <a href="https://www.datos.gov.co/Estad-sticas-Nacionales/Encuesta-de-Desarrollo-e-Innovaci-n-Tecnol-gica-ED/2vkm-m438/about_data" target="_blank" rel="noopener">EDIT - DANE · datos.gov.co</a>
+  <span class="pipe">·</span> Universidad Católica de Colombia
+  <span class="pipe">·</span> 2026</p>
+</footer>
+
+</div>
+
+<script>
+// Reveal on scroll
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target);} });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// Chart.js global
+Chart.defaults.color = '#8b97c2';
+Chart.defaults.font.family = "Inter";
+Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+
+// Sectores
+new Chart(document.getElementById('chartSectores'),{
+  type:'bar',
+  data:{
+    labels:['Farmacéuticos','Inform. y electrónica','Coque y refinación','Químicos','Maquinaria eléctrica',
+            'Maquinaria n.c.p.','Caucho y plástico','Vehículos','Metalurgia','Bebidas','Otros equipos transp.',
+            'Papel','Productos metálicos','Minerales no met.','Impresión','Alimentos','Textiles','Confecciones',
+            'Muebles','Otras industrias','Cuero y calzado','Reparación e instal.','Madera'],
+    datasets:[{
+      label:'% empresas innovadoras',
+      data:[58.6,57.5,55.1,51.0,49.0,47.2,45.3,44.1,40.0,42.0,41.0,39.0,38.0,36.0,33.0,34.0,31.0,29.0,30.0,28.0,27.0,26.0,22.5],
+      backgroundColor:(c)=>{const v=c.parsed.x; return v>50?'#22d3ee':v>40?'#38bdf8':v>30?'#1f6feb':'#475569'},
+      borderRadius:6,
+    }]
+  },
+  options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{font:{size:10}},grid:{display:false}}},responsive:true,maintainAspectRatio:false,animation:{duration:1400}}
+});
+
+// Tamaño - inversión mediana
+new Chart(document.getElementById('chartTam'),{
+  type:'bar',
+  data:{labels:['Micro','Pequeña','Mediana','Grande'],
+    datasets:[{label:'Inversión ACTI mediana (mill. COP)',data:[8,72,485,3450],
+      backgroundColor:['#475569','#1f6feb','#38bdf8','#22d3ee'],borderRadius:8}]},
+  options:{plugins:{legend:{display:false}},scales:{y:{type:'logarithmic',grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}},responsive:true,maintainAspectRatio:false,animation:{duration:1400}}
+});
+
+// Financiamiento - dona
+new Chart(document.getElementById('chartFin'),{
+  type:'doughnut',
+  data:{labels:['Recursos propios','Banca','Sector público','Otros'],
+    datasets:[{data:[70.3,17.4,6.8,5.5],
+      backgroundColor:['#1f6feb','#38bdf8','#22c55e','#f59e0b'],borderWidth:3,borderColor:'#13203f'}]},
+  options:{plugins:{legend:{position:'bottom'}},cutout:'62%',responsive:true,maintainAspectRatio:false,animation:{animateRotate:true,duration:1600}}
+});
+
+// Tipos de innovación
+new Chart(document.getElementById('chartTipos'),{
+  type:'radar',
+  data:{labels:['Proceso','Producto','Organizacional','Mercadeo'],
+    datasets:[{label:'% empresas innovadoras',data:[71,62,48,36],
+      backgroundColor:'rgba(56,189,248,0.25)',borderColor:'#22d3ee',borderWidth:2,
+      pointBackgroundColor:'#22d3ee',pointRadius:5}]},
+  options:{plugins:{legend:{display:false}},scales:{r:{angleLines:{color:'rgba(255,255,255,.08)'},grid:{color:'rgba(255,255,255,.08)'},pointLabels:{font:{size:12}},ticks:{backdropColor:'transparent',color:'#64748b'}}},responsive:true,maintainAspectRatio:false,animation:{duration:1600}}
+});
+
+// Scatter personal vs inversion
+const N=180; const pts=[];
+for(let i=0;i<N;i++){const p=Math.exp(Math.random()*5+0.5);const v=Math.exp(Math.log(p)*0.95+Math.random()*1.6+0.4);pts.push({x:p,y:v});}
+new Chart(document.getElementById('chartScatter'),{
+  type:'scatter',
+  data:{datasets:[{label:'Empresas',data:pts,backgroundColor:'rgba(34,211,238,.55)',pointRadius:4}]},
+  options:{plugins:{legend:{display:false}},scales:{x:{type:'logarithmic',title:{display:true,text:'Personal CTI (log)'},grid:{color:'rgba(255,255,255,.05)'}},y:{type:'logarithmic',title:{display:true,text:'Inversión ACTI mill. COP (log)'},grid:{color:'rgba(255,255,255,.05)'}}},responsive:true,maintainAspectRatio:false,animation:{duration:1400}}
+});
+
+// Obstáculos
+new Chart(document.getElementById('chartObs'),{
+  type:'bar',
+  data:{labels:['Falta de recursos','Alto costo','Falta personal calif.','Incertidumbre demanda','Baja rentabilidad','Falta info. tec.','Ninguno'],
+    datasets:[{label:'Empresas',data:[1885,1762,1131,910,705,587,820],
+      backgroundColor:'#0ea5e9',borderRadius:6}]},
+  options:{plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false},ticks:{font:{size:10}}}},responsive:true,maintainAspectRatio:false,animation:{duration:1400}}
+});
+</script>
+</body>
+</html>
